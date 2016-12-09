@@ -1,0 +1,1 @@
+localhost become_user=trevor ansible_connection=local
