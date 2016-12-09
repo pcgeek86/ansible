@@ -3,33 +3,42 @@
     git_dir: /home/trevor/git 
   become: true
   tasks:
+  - name: Add Kubernetes GPG Key
+    shell: curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
   - name: Install Python 3 Pip
     apt:
       name: python3-pip
   - name: Install HTTPie
     apt:
       name: httpie
-  - name: Add Vim PPA
-    apt_repository:
-      repo: ppa:jonathonf/vim
-      update_cache: no
-  - name: Install Vim 8
-    apt:
-      name: vim
+#  - name: Add Vim PPA
+#    apt_repository:
+#      repo: ppa:jonathonf/vim
+#      update_cache: no
+#  - name: Install Vim 8
+#    apt:
+#      name: vim
   - name: Install zsh shell
     apt:
       name: zsh
   - name: Install Oh My ZSH
-    command: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
   - name: Install inotify tools
     apt: name=inotify-tools
   - name: Clone Vim8
     git:
-      dest: "{{ git_dir }}"
+      dest: "{{ git_dir }}/vim"
       repo: https://github.com/vim/vim 
+  - name: Install ncurse dev library
+    apt:
+      name: libncurses5-dev
+  - name: Compile Vim8
+    shell: make
+    args:
+      chdir: "{{ git_dir}}/vim"
   - name: Clone FSWatch
     git:
-      dest: "{{ git_dir }}"
+      dest: "{{ git_dir }}/fswatch"
       repo: https://github.com/emcrisostomo/fswatch
   - name: Check Docker
     shell: 'dpkg-query --show --showformat ''${Status}'' docker-engine'
