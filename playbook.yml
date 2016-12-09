@@ -1,0 +1,43 @@
+- hosts: all
+  vars:
+    git_dir: /home/trevor/git 
+  become: true
+  tasks:
+  - name: Install Python 3 Pip
+    apt:
+      name: python3-pip
+  - name: Install HTTPie
+    apt:
+      name: httpie
+  - name: Add Vim PPA
+    apt_repository:
+      repo: ppa:jonathonf/vim
+      update_cache: no
+  - name: Install Vim 8
+    apt:
+      name: vim
+  - name: Install zsh shell
+    apt:
+      name: zsh
+  - name: Install Oh My ZSH
+    command: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+  - name: Install inotify tools
+    apt: name=inotify-tools
+  - name: Clone Vim8
+    git:
+      dest: "{{ git_dir }}"
+      repo: https://github.com/vim/vim 
+  - name: Clone FSWatch
+    git:
+      dest: "{{ git_dir }}"
+      repo: https://github.com/emcrisostomo/fswatch
+  - name: Check Docker
+    shell: 'dpkg-query --show --showformat ''${Status}'' docker-engine'
+    register: docker_status
+  - name: Install Docker
+    register: docker_result
+    shell: "curl -sSL https://get.docker.com/ | sh"
+    when: docker_status.stdout.find('installed') != -1
+  - name: Add Ansible PPA
+    apt_repository:
+      repo: ppa:ansible/ansible
